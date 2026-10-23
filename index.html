@@ -1,0 +1,44 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إيمو ليجند - ولد عطاء</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI';background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;color:white}
+.header{background:rgba(0,0,0,0.4);padding:18px;text-align:center;border-bottom:2px solid #ff6a00}
+.header h1{font-size:30px;background:linear-gradient(45deg,#ff6a00,#ee0979);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900}
+.card{background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:20px;margin:15px}
+.btn{background:linear-gradient(45deg,#ff6a00,#ee0979);border:none;padding:13px;border-radius:30px;color:white;font-weight:bold;width:100%;margin:8px 0;cursor:pointer;font-size:16px}
+.avatar{width:65px;height:65px;border-radius:50%;border:3px solid #ff6a00;object-fit: cover;}
+.row{display:flex;gap:12px;align-items:center}
+.badge{background:#ff6a00;padding:4px 12px;border-radius:10px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>👑 إيمو ليجند</h1>
+<h2 style="color:#ffcc70">ولد عطاء - WALAD ATAA</h2>
+<p style="opacity:0.8;font-size:12px;margin-top:6px">التطبيق الرسمي للأسطورة ولد عطاء 🇾🇪</p>
+</div>
+<div class="card">
+<div class="row">
+<!-- تم تحديث رابط الصورة بصورتك الشخصية هنا -->
+<img src="https://squarespace-cdn.com" class="avatar">
+<div>
+<div style="font-weight:bold;font-size:18px">ولد عطاء <span class="badge">الأسطورة</span></div>
+<div style="font-size:12px;opacity:0.7">متصل الآن • اليمن، البيضاء</div>
+</div>
+</div>
+<p style="margin-top:14px">حياكم الله في تطبيق إيمو ليجند الخاص بي! 🔥 هذا هو رابطي الرسمي!</p>
+<button class="btn" onclick="navigator.clipboard.writeText(window.location.href);alert('✅ تم نسخ رابطك: '+window.location.href)">📋 انسخ رابط التطبيق الرسمي</button>
+</div>
+<div class="card" style="text-align:center">
+<h3>🔗 رابطك الرسمي</h3>
+<p id="link" style="background:rgba(0,0,0,0.5);padding:12px;border-radius:12px;margin:12px 0;word-break:break-all;border:1px dashed #ff6a00"></p>
+<button class="btn" onclick="navigator.clipboard.writeText(window.location.href);alert('تم النسخ!')">🚀 مشاركة رابط ولد عطاء</button>
+</div>
+<script>document.getElementById('link').textContent=window.location.href</script>
+</body>
+</html>
