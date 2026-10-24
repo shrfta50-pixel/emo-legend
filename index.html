@@ -4,163 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>imo Legend</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyCBkGggHnBsLaSi0RH211cfbCFDBijH4BU",
-  authDomain: "imo-legend.firebaseapp.com",
-  databaseURL: "https://imo-legend-default-rtdb.firebaseio.com",
-  projectId: "imo-legend",
-  storageBucket: "imo-legend.firebasestorage.app",
-  messagingSenderId: "930356255753",
-  appId: "1:930356255753:web:bfca539599adbea4df6cd8"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-let currentUser=null;
-document.addEventListener('DOMContentLoaded',()=>{
-  const $=id=>document.getElementById(id);
-  const show=id=>{
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    $(id).classList.add('active');
-  };
-  $('btn-login').onclick=()=>{
-    const name=$('username').value.trim();
-    const phone=$('phone').value.trim();
-    if(!name){alert('ادخل اسمك');return;}
-    currentUser={name,phone,id:'IMO_'+Math.floor(10000+Math.random()*90000),avatar:name[0]};
-    set(ref(db,'users/'+currentUser.id),currentUser);
-    show('main-screen');
-    loadAll();
-    $('display-name').textContent=name;
-    $('my-imo-id').textContent=currentUser.id;
-  };
-  $('global-chat-card').onclick=()=>{ show('chat-screen'); loadMessages(); };
-  $('btn-back-chat').onclick=()=>show('main-screen');
-  $('nav-chats').onclick=()=>show('main-screen');
-  $('nav-calls').onclick=()=>show('calls-screen');
-  $('nav-contacts').onclick=()=>show('contacts-screen');
-  $('nav-settings').onclick=()=>show('settings-screen');
-  $('nav-chats2').onclick=()=>show('main-screen');
-  $('nav-calls2').onclick=()=>show('calls-screen');
-  $('nav-contacts2').onclick=()=>show('contacts-screen');
-  $('nav-settings2').onclick=()=>show('settings-screen');
-  $('btn-account').onclick=()=>show('account-screen');
-  $('btn-privacy').onclick=()=>show('privacy-screen');
-  $('btn-notif').onclick=()=>show('notif-screen');
-  $('back-account').onclick=()=>show('settings-screen');
-  $('back-privacy').onclick=()=>show('settings-screen');
-  $('back-notif').onclick=()=>show('settings-screen');
-  $('back-settings').onclick=()=>show('main-screen');
-  const send=()=>{
-    const t=$('chat-input').value.trim();
-    if(!t||!currentUser) return;
-    push(ref(db,'messages'),{sender:currentUser.name,senderId:currentUser.id,text:t,time:new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}),timestamp:Date.now()});
-    $('chat-input').value='';
-  };
-  $('btn-send').onclick=send;
-  $('chat-input').onkeypress=e=>{if(e.key==='Enter') send();};
-  function loadAll(){
-    onValue(ref(db,'users'),snap=>{
-      const list=$('users-stories'); 
-      list.innerHTML='<div class="story-item"><div class="avatar-ring"><div class="avatar" style="background:#1a2942">+</div></div><div class="story-name">قصتي</div></div>';
-      const data=snap.val(); if(!data) return;
-      Object.values(data).forEach(u=>{
-        const d=document.createElement('div'); d.className='story-item';
-        d.innerHTML=`<div class="avatar-ring"><div class="avatar">${u.avatar}</div></div><div class="story-name">${u.name.split(' ')[0]}</div>`;
-        list.appendChild(d);
-      });
-      const cl=$('contacts-list-real'); if(cl){cl.innerHTML=''; Object.values(data).forEach(u=>{
-        const row=document.createElement('div'); row.className='contact-row';
-        row.innerHTML=`<div class="avatar-ring" style="width:50px;height:50px"><div class="avatar">${u.avatar}</div></div><div style="flex:1"><div class="chat-name">${u.name}</div><div class="chat-sub">متصل الآن •</div></div>`;
-        cl.appendChild(row);
-      });}
-    });
-  }
-  function loadMessages(){
-    onValue(ref(db,'messages'),snap=>{
-      const cont=$('messages-container'); cont.innerHTML='';
-      const data=snap.val(); if(!data) return;
-      const msgs=Object.values(data);
-      msgs.slice(-50).forEach(m=>{
-        const isMe=currentUser&&m.senderId===currentUser.id;
-        const b=document.createElement('div'); b.className=`msg-bubble ${isMe?'msg-sent':'msg-received'}`;
-        b.innerHTML=`${isMe?'':`<div class="msg-sender">${m.sender}</div>`}<div>${m.text}</div><div class="msg-time">${m.time} ${isMe?'✓✓':''}</div>`;
-        cont.appendChild(b);
-      });
-      cont.scrollTop=cont.scrollHeight;
-      if(msgs.length) $('global-last-msg').textContent=msgs[msgs.length-1].text;
-    });
-  }
-});
-</script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <style>
-:root{--bg:#050a14;--card:#0b1528;--neon:#00d2ff;--blue:#0072ff;--sub:#8a99ad;--input:#0d1b32;--border:rgba(0,210,255,.3)}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal',sans-serif}
-body{background:#02050a;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh}
-.app{width:100%;max-width:420px;height:100vh;max-height:900px;background:var(--bg);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(0,210,255,.2)}
-.screen{display:none;flex-direction:column;height:100%;overflow-y:auto;background:radial-gradient(circle at top,#071326 0%,#030812 100%)}.screen.active{display:flex}
-.header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;background:rgba(11,21,40,.9)}
-.logo{font-size:22px;font-weight:700;text-shadow:0 0 10px var(--neon)}
-.input-box{width:100%;padding:14px 16px;background:var(--input);border:1.5px solid var(--border);border-radius:14px;color:#fff;outline:none}
-.btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--neon),var(--blue));border:none;border-radius:14px;color:#fff;font-weight:700;cursor:pointer}
-.stories{padding:12px 0;display:flex;gap:14px;overflow-x:auto;padding-right:16px;padding-left:16px}
-.story-item{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:60px}
-.avatar-ring{width:56px;height:56px;border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--neon),var(--blue))}
-.avatar{width:100%;height:100%;border-radius:50%;background:#1a2942;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid var(--bg)}
-.story-name{font-size:11px;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chat-card{display:flex;align-items:center;padding:12px;background:rgba(11,21,40,.4);border-radius:16px;margin:8px 12px}
-.chat-info{flex:1;margin-right:12px}.chat-name{font-size:15px;font-weight:700}.chat-sub{font-size:12px;color:var(--sub)}
-.msg-container{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
-.msg-bubble{max-width:78%;padding:10px 14px;border-radius:18px;font-size:14px}
-.msg-received{align-self:flex-start;background:#0f203c;border:1px solid rgba(0,210,255,.2)}
-.msg-sent{align-self:flex-end;background:linear-gradient(135deg,#0088ff,#0055b3)}
-.msg-sender{font-size:10px;color:var(--neon);margin-bottom:4px}
-.msg-time{font-size:9px;opacity:.6;margin-top:4px;text-align:left}
-.input-area{padding:12px 16px;background:var(--card);display:flex;gap:8px;align-items:center}
-.send-btn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--neon),var(--blue));border:none;color:#fff;cursor:pointer}
-.bottom-nav{height:68px;background:rgba(11,21,40,.98);border-top:1px solid rgba(0,210,255,.15);display:flex;justify-content:space-around;align-items:center}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--sub);font-size:11px;cursor:pointer;width:25%}.nav-item.active{color:var(--neon)}
-.contact-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(0,210,255,.06)}
-.setting-row{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,210,255,.08);background:rgba(11,21,40,.3);margin:6px 12px;border-radius:14px;border:1px solid rgba(0,210,255,.1)}
-.search{margin:12px;background:var(--input);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;gap:8px;color:var(--sub)}
+body{font-family:Cairo,sans-serif;background:#f4f7f6;margin:0;height:100vh;overflow:hidden}
+.hidden{display:none!important}
+#auth-screen{position:fixed;inset:0;background:#0084ff;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:#fff;padding:30px;border-radius:15px;width:100%;max-width:350px;text-align:center}
+.logo{width:80px;height:80px;background:#0084ff;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;margin:0 auto 15px}
+.input-field{width:90%;background:#f9f9f9;border:1px solid #e2e2e2;border-radius:10px;padding:12px;text-align:center;margin-bottom:15px;font-weight:600}
+.btn-blue{width:98%;background:#0084ff;color:#fff;font-weight:bold;padding:12px;border-radius:10px;border:none}
+.btn-green{width:98%;background:#00a884;color:#fff;font-weight:bold;padding:12px;border-radius:10px;border:none}
+#app-screen{display:flex;flex-direction:column;height:100vh}
+#app-screen header{background:#0084ff;color:#fff;padding:15px;display:flex;justify-content:space-between}
+#chat-messages{flex:1;overflow-y:auto;padding:15px;background:#efeae2}
 </style>
 </head>
 <body>
-<div class="app">
-<div id="login-screen" class="screen active" style="justify-content:center;align-items:center;padding:24px;text-align:center">
-<div style="width:80px;height:80px;border:2px solid var(--neon);border-radius:20px;box-shadow:0 0 20px var(--neon);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:10px">💬</div>
-<h1 style="font-size:42px;font-weight:800;text-shadow:0 0 15px var(--neon)">imo</h1>
-<h2 style="margin-top:10px">Welcome back</h2>
-<p style="color:var(--sub);font-size:13px;margin-bottom:20px">Sign in to continue</p>
-<div style="width:100%;text-align:right;margin-bottom:8px;font-size:13px">Phone Number</div>
-<input id="phone" class="input-box" placeholder="+967..." style="margin-bottom:16px">
-<div style="width:100%;text-align:right;margin-bottom:8px;font-size:13px">Username</div>
-<input id="username" class="input-box" placeholder="اسمك" style="margin-bottom:16px">
-<button id="btn-login" class="btn">Continue</button>
-<div style="margin-top:15px;padding:8px 16px;background:rgba(0,210,255,.1);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--neon)">Your IMO ID <span id="my-imo-id">IMO_64478</span></div>
+<div id="auth-screen">
+<div class="auth-box">
+<div class="logo">imo</div>
+<h2 style="color:#0084ff;margin:0">imo Legend</h2>
+<p style="color:gray;font-size:12px;margin-bottom:20px">مرحباً بك في النسخة المطورة</p>
+<div id="phone-form">
+<input id="phone-input" placeholder="رقم الهاتف (مثال: +967...)" class="input-field">
+<input id="username-input" placeholder="اكتب اسمك هنا" class="input-field">
+<button onclick="requestOTP()" class="btn-blue">متابعة وإرسال الرمز</button>
 </div>
-<div id="main-screen" class="screen">
-<div class="header"><div>••• 📷</div><div class="logo">imo</div></div>
-<div class="search">🔍 ابحث في الدردشات...</div>
-<div style="padding-right:16px;color:var(--sub);font-size:12px">القصص - اللي يسجل تطلع صورته هنا</div>
-<div id="users-stories" class="stories"></div>
-<div class="chat-card" id="global-chat-card"><div class="avatar-ring" style="width:50px;height:50px"><div class="avatar">🌐</div></div><div class="chat-info"><div class="chat-name">الغرفة العامة</div><div class="chat-sub" id="global-last-msg">اضغط للدخول...</div></div></div>
-<div class="bottom-nav"><div class="nav-item active" id="nav-chats">💬 الدردشات</div><div class="nav-item" id="nav-calls">📞 المكالمات</div><div class="nav-item" id="nav-contacts">👥 جهات الاتصال</div><div class="nav-item" id="nav-settings">⚙️ الإعدادات</div></div>
+<div id="otp-form" class="hidden">
+<p style="color:#00a884;font-size:12px;font-weight:bold">رمز التحقق التجريبي هو: 123456</p>
+<input id="otp-input" placeholder="أدخل الرمز (6 أرقام)" class="input-field">
+<button onclick="verifyOTP()" class="btn-green">تأكيد تسجيل الدخول</button>
 </div>
-<div id="chat-screen" class="screen">
-<div class="header"><button id="btn-back-chat" style="background:none;border:none;color:var(--neon);font-size:20px">←</button><div style="flex:1;text-align:right"><div style="font-weight:700" id="display-name">أحمد</div><div style="font-size:11px;color:var(--neon)">متصل الآن</div></div><div class="avatar-ring" style="width:38px;height:38px"><div class="avatar">A</div></div></div>
-<div id="messages-container" class="msg-container"></div>
-<div class="input-area"><input id="chat-input" class="input-box" placeholder="اكتب..." style="flex:1"><button class="send-btn" id="btn-send">➤</button></div>
 </div>
-<div id="calls-screen" class="screen"><div class="header"><span style="font-weight:700">المكالمات</span></div><div class="contact-row"><div class="avatar-ring" style="width:50px;height:50px"><div class="avatar">A</div></div><div style="flex:1"><div class="chat-name">أحمد حسن</div><div class="chat-sub">مكالمة صوتية • اليوم</div></div></div><div class="bottom-nav"><div class="nav-item" id="nav-chats2">💬</div><div class="nav-item active" id="nav-calls2">📞</div><div class="nav-item" id="nav-contacts2">👥</div><div class="nav-item" id="nav-settings2">⚙️</div></div></div>
-<div id="contacts-screen" class="screen"><div class="header"><span style="font-weight:700">جهات الاتصال</span></div><div id="contacts-list-real"></div><div class="bottom-nav"><div class="nav-item" id="nav-chats3">💬</div><div class="nav-item" id="nav-calls3">📞</div><div class="nav-item active" id="nav-contacts3">👥</div><div class="nav-item" id="nav-settings3">⚙️</div></div></div>
-<div id="settings-screen" class="screen"><div class="header"><span style="font-weight:700">الإعدادات</span></div><div class="setting-row" id="btn-account"><div class="chat-name">الحساب</div><span>→</span></div><div class="setting-row" id="btn-privacy"><div class="chat-name">الخصوصية</div><span>→</span></div><div class="setting-row" id="btn-notif"><div class="chat-name">الإشعارات</div><span>→</span></div><button id="back-settings" class="btn" style="margin:20px">رجوع</button></div>
-<div id="account-screen" class="screen"><div class="header"><span>الحساب</span></div><button id="back-account" class="btn" style="margin:20px">رجوع</button></div>
-<div id="privacy-screen" class="screen"><div class="header"><span>الخصوصية</span></div><button id="back-privacy" class="btn" style="margin:20px">رجوع</button></div>
-<div id="notif-screen" class="screen"><div class="header"><span>الإشعارات</span></div><button id="back-notif" class="btn" style="margin:20px">رجوع</button></div>
 </div>
+<div id="app-screen" class="hidden">
+<header><span>الدردشة العامة</span><button onclick="logout()" style="background:#ff4d4d;color:#fff;border:none;padding:6px 12px;border-radius:5px">خروج</button></header>
+<div id="chat-messages"></div>
+<div style="background:#fff;padding:10px;display:flex;gap:10px"><input id="message-input" style="flex:1;background:#f1f1f1;border:none;padding:12px;border-radius:10px" placeholder="اكتب رسالة..."><button onclick="sendMessage()" style="background:#0084ff;color:#fff;border:none;padding:12px 20px;border-radius:10px">إرسال</button></div>
+</div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyCBkGggHnBsLaSi0RH211cfbCFDBijH4BU",authDomain:"imo-legend.firebaseapp.com",databaseURL:"https://imo-legend-default-rtdb.firebaseio.com",projectId:"imo-legend",storageBucket:"imo-legend.firebasestorage.app",messagingSenderId:"930356255753",appId:"1:930356255753:web:bfca539599adbea4df6cd8"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+let tempPhone='',tempUsername='';
+function requestOTP(){const p=document.getElementById('phone-input').value.trim();const u=document.getElementById('username-input').value.trim();if(!p||!u){alert('أدخل البيانات كاملة!');return;}tempPhone=p;tempUsername=u;document.getElementById('phone-form').classList.add('hidden');document.getElementById('otp-form').classList.remove('hidden');}
+function verifyOTP(){if(document.getElementById('otp-input').value.trim()!=='123456'){alert('الرمز هو 123456');return;}localStorage.setItem('imo_username',tempUsername);localStorage.setItem('imo_phone',tempPhone);document.getElementById('auth-screen').classList.add('hidden');document.getElementById('app-screen').classList.remove('hidden');}
+function sendMessage(){const t=document.getElementById('message-input').value;const u=localStorage.getItem('imo_username');if(!t.trim())return;db.ref('chats').push({username:u,text:t,timestamp:Date.now()});document.getElementById('message-input').value='';}
+function logout(){localStorage.clear();location.reload();}
+db.ref('chats').limitToLast(50).on('value',snap=>{const box=document.getElementById('chat-messages');box.innerHTML='';snap.forEach(c=>{const m=c.val();box.innerHTML+=`<div style="background:#fff;padding:10px;margin:5px;border-radius:10px"><b style="color:#0084ff;font-size:11px">${m.username}</b><div>${m.text}</div></div>`;});});
+</script>
 </body>
 </html>
